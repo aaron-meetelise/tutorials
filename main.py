@@ -47,13 +47,13 @@ def show_introduction():
     - Build and manage your own Chart of Accounts.
     - Explore budgeting, forecasting, consolidation, and real‑world lease accounting.
     
-    Use the sidebar to navigate through the modules. Each module combines teaching with interactive examples and quizzes.
+    Use the sidebar to navigate through the modules. All exercises are contained within the UI.
     """)
 
 def show_module1():
     st.header("Module 1: Accounting Fundamentals & the 5 Categories")
     st.markdown("### Teaching Section")
-    with st.expander("Learn the Basics"):
+    with st.expander("Learn the Basics", expanded=True):
         st.markdown("""
         In accounting, every transaction falls into one of five key categories:
         
@@ -154,7 +154,7 @@ def show_module1():
 def show_module2():
     st.header("Module 2: Journal Entries, Accruals & Balancing")
     st.markdown("### Teaching Section")
-    with st.expander("Recording Transactions & Accruals"):
+    with st.expander("Recording Transactions & Accruals", expanded=True):
         st.markdown("""
         **Journal Entries:**  
         - Every transaction is recorded as a journal entry with debits and credits that must balance.
@@ -242,7 +242,7 @@ def show_module2():
             st.error("Unbalanced Entry: Please ensure total debits equal total credits.")
     
     st.markdown("### Hands-On: Simulate Your Own Journal Entry")
-    with st.expander("Enter details for a new transaction"):
+    with st.expander("Enter details for a new transaction", expanded=True):
         debit_account = st.text_input("Debit Account", "Cash", key="debit_account_own")
         debit_amt = st.number_input("Debit Amount ($)", min_value=0.0, value=1000.0, step=50.0, key="debit_amt_own")
         credit_account = st.text_input("Credit Account", "Rental Income", key="credit_account_own")
@@ -259,7 +259,7 @@ def show_module2():
 def show_module3():
     st.header("Module 3: Managing the Chart of Accounts")
     st.markdown("### Teaching Section: Chart of Accounts Overview")
-    with st.expander("What is a Chart of Accounts?"):
+    with st.expander("What is a Chart of Accounts?", expanded=True):
         st.markdown("""
         A Chart of Accounts (COA) is an organized listing of all accounts in your accounting system, grouped into the five fundamental categories:
         
@@ -294,7 +294,7 @@ def show_module3():
 def show_module4():
     st.header("Module 4: Budgeting, Forecasting & Consolidation")
     st.markdown("### Teaching Section: Financial Planning")
-    with st.expander("Budgeting & Forecasting Basics"):
+    with st.expander("Budgeting & Forecasting Basics", expanded=True):
         st.markdown("""
         **Budgeting:**  
         - Create financial plans for property operations.
@@ -340,7 +340,7 @@ def show_module4():
 def show_module5():
     st.header("Module 5: Real Estate Practices & Product Integration")
     st.markdown("### Teaching Section: Real Estate Specifics")
-    with st.expander("Lease Accounting & Operational Metrics"):
+    with st.expander("Lease Accounting & Operational Metrics", expanded=True):
         st.markdown("""
         **Lease Accounting:**  
         - **Revenue Recognition:** How and when rental income is recorded.
@@ -357,27 +357,18 @@ def show_module5():
     total_incentive = st.number_input("Total Incentive Discount ($)", value=1200, step=100, key="lease_incentive")
     monthly_adjustment = total_incentive / lease_term
     st.write("Monthly incentive adjustment: $", monthly_adjustment)
-    
-    st.markdown("### Workshop Discussion: Integrating Accounting into Your Product")
-    st.markdown("""
-    **Discussion Points:**
-    - Which financial metrics (e.g., net operating income, occupancy rate) are most important to display in your property management dashboard?
-    - How can real-time accounting data improve operational decisions?
-    - Consider any challenges with integrating legacy accounting systems into a new digital platform.
-    """)
-    st.info("Discuss these points with your team offline or in a breakout session.")
 
 def show_module6():
     st.header("Module 6: Review & Assessment")
     st.markdown("### Course Recap")
-    with st.expander("Review Key Concepts"):
+    with st.expander("Review Key Concepts", expanded=True):
         st.markdown("""
         **Recap:**
         - **Module 1:** The five fundamental categories and balanced transactions.
         - **Module 2:** Recording journal entries, accruals, and reversing entries.
         - **Module 3:** Building and managing a Chart of Accounts.
         - **Module 4:** Budgeting, forecasting, and consolidating financial data.
-        - **Module 5:** Real estate-specific accounting practices and integrating them into product design.
+        - **Module 5:** Real estate-specific accounting practices.
         """)
     
     st.markdown("### Final Quiz")
@@ -404,7 +395,7 @@ def show_module6():
             st.write("Q4: Correct!")
         else:
             st.write("Q4: Incorrect. The correct entry is: Debit: Expense, Credit: Accrued Expenses.")
-        st.info("Review your answers and discuss as a team to ensure a solid understanding of the material.")
+        st.info("Review your answers to ensure a solid understanding of the material.")
     
     st.markdown("### Next Steps")
     st.markdown("""
