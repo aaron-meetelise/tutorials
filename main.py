@@ -13,7 +13,6 @@ def main():
         "Module 4: Budgeting, Forecasting & Consolidation",
         "Module 5: Real Estate Practices & Product Integration",
         "Module 6: Review & Assessment",
-        "Appendix: Tools & Extra Resources"
     ]
     choice = st.sidebar.radio("Go to", pages)
     
@@ -31,8 +30,6 @@ def main():
         show_module5()
     elif choice == pages[6]:
         show_module6()
-    elif choice == pages[7]:
-        show_appendix()
 
 # --- Module Functions ---
 
@@ -47,7 +44,7 @@ def show_introduction():
     - Build and manage your own Chart of Accounts.
     - Explore budgeting, forecasting, consolidation, and real‑world lease accounting.
     
-    Use the sidebar to navigate through the modules. All exercises are contained within the UI.
+    Use the sidebar to navigate through the modules. Each module combines teaching with interactive examples and quizzes.
     """)
 
 def show_module1():
@@ -157,20 +154,20 @@ def show_module2():
     with st.expander("Recording Transactions & Accruals", expanded=True):
         st.markdown("""
         **Journal Entries:**  
-        - Every transaction is recorded as a journal entry with debits and credits that must balance.
+        Every transaction is recorded with debits and credits that must balance.
         
         **Accruals:**  
-        - Record revenues or expenses when they occur, even if cash hasn’t exchanged hands.
-        - Example: If a $500 repair expense is incurred in December but paid in January, record an accrual in December.
+        Record revenues or expenses when they occur—even if cash hasn’t changed hands.
+        - *Example:* If a $500 repair expense is incurred in December but paid in January, record an accrual in December.
         
         **Reversing Entries:**  
-        - In the following period, a reversing entry is made to cancel out the accrual.
+        In the following period, a reversing entry cancels out the accrual.
         
         **Example of an Accrual Entry:**  
         - **Debit:** Repair Expense $500  
         - **Credit:** Accrued Expenses $500
         
-        **Reversing Entry in Next Period:**  
+        **Reversing Entry:**  
         - **Debit:** Accrued Expenses $500  
         - **Credit:** Repair Expense $500
         """)
@@ -271,25 +268,53 @@ def show_module3():
         
         A well-structured COA allows you to record transactions accurately and generate financial statements that inform decision-making.
         """)
-    
+
     st.markdown("### Interactive Exercise: Build Your Chart of Accounts")
-    st.markdown("**Instructions:** Enter account names and select the category for each account.")
-    coa_df = pd.DataFrame({
-        "Category": ["", "", ""],
-        "Account Name": ["", "", ""]
-    })
-    edited_coa_df = st.data_editor(
-        coa_df,
-        num_rows="fixed",
-        key="coa_editor",
-        column_config={
-            "Category": st.column_config.SelectboxColumn("Category", options=["Assets", "Liabilities", "Equity", "Revenue", "Expenses"])
-        }
-    )
-    if st.button("Submit COA", key="submit_coa_editor"):
+    st.markdown("For each fundamental category, select the appropriate account from the dropdown below. Your answer will be compared to the correct account.")
+
+    # Define the five categories.
+    categories = ["Assets", "Liabilities", "Equity", "Revenue", "Expenses"]
+
+    # Remove any default by prepending an empty string.
+    account_options = {
+        "Assets": ["", "Accrued Expenses", "Unpaid Vendor Invoice", "Cash", "Retained Earnings", "Maintenance", "Rental Income"],
+        "Liabilities": ["", "Accrued Expenses", "Unpaid Vendor Invoice", "Cash", "Retained Earnings", "Maintenance", "Rental Income"],
+        "Equity": ["", "Accrued Expenses", "Unpaid Vendor Invoice", "Cash", "Retained Earnings", "Maintenance", "Rental Income"],
+        "Revenue": ["", "Accrued Expenses", "Unpaid Vendor Invoice", "Cash", "Retained Earnings", "Maintenance", "Rental Income"],
+        "Expenses": ["", "Accrued Expenses", "Unpaid Vendor Invoice", "Cash", "Retained Earnings", "Maintenance", "Rental Income"]
+    }
+
+    # Define the correct mapping.
+    correct_mapping = {
+        "Assets": "Cash",
+        "Liabilities": "Unpaid Vendor Invoice",
+        "Equity": "Retained Earnings",
+        "Revenue": "Rental Income",
+        "Expenses": "Maintenance"
+    }
+
+    # Create a list to store the user selections.
+    coa_entries = []
+    for category in categories:
+        selected_account = st.selectbox(f"Select the correct {category} Account", 
+                                        options=account_options[category], 
+                                        key=f"{category}_account")
+        coa_entries.append({
+            "Category": category, 
+            "Your Answer": selected_account, 
+            "Correct Answer": correct_mapping[category]
+        })
+
+    if st.button("Submit Chart of Accounts", key="submit_coa_custom"):
+        coa_df = pd.DataFrame(coa_entries)
         st.markdown("### Your Chart of Accounts")
-        st.table(edited_coa_df)
-        st.success("Your Chart of Accounts has been created!")
+        st.table(coa_df)
+        # Display correctness feedback for each category.
+        for idx, row in coa_df.iterrows():
+            if row["Your Answer"] == row["Correct Answer"]:
+                st.write(f"**{row['Category']}**: Correct!")
+            else:
+                st.write(f"**{row['Category']}**: Incorrect. The correct account is **{row['Correct Answer']}**.")
 
 def show_module4():
     st.header("Module 4: Budgeting, Forecasting & Consolidation")
@@ -345,7 +370,7 @@ def show_module5():
         **Lease Accounting:**  
         - **Revenue Recognition:** How and when rental income is recorded.
         - **Depreciation:** Spreading the cost of property assets over their useful lives.
-        - **Lease Incentives:** Discounts or incentives spread over the lease term.
+        - **Lease Incentives:** Concessions (discounts) that are spread evenly over the lease term.
         
         **Operational Metrics:**  
         - Track key performance indicators (KPIs) such as occupancy rate and net operating income.
@@ -353,69 +378,266 @@ def show_module5():
         """)
     
     st.markdown("### Interactive Exercise: Lease Incentive Simulator")
-    lease_term = st.selectbox("Lease Term (months)", options=[12, 24, 36], key="lease_term")
-    total_incentive = st.number_input("Total Incentive Discount ($)", value=1200, step=100, key="lease_incentive")
-    monthly_adjustment = total_incentive / lease_term
-    st.write("Monthly incentive adjustment: $", monthly_adjustment)
+    # Force selection with a "Please select" option.
+    lease_term_options = ["Please select", 12, 24, 36]
+    lease_term = st.selectbox("Lease Term (months)", options=lease_term_options, key="lease_term")
+    
+    total_incentive = st.number_input("Total Incentive Discount ($)", value=0, step=100, key="lease_incentive")
+    
+    if lease_term != "Please select" and total_incentive > 0:
+        monthly_adjustment = total_incentive / lease_term
+        st.write("Monthly incentive adjustment: $", monthly_adjustment)
+    else:
+        monthly_adjustment = None
+        st.write("Please select a lease term and enter a total incentive discount.")
+    
+    st.markdown("### Challenge: Configure the Recurring Journal Entry for the Lease Incentive")
+    st.markdown("""
+    To record the lease incentive discount over the life of the lease, a recurring journal entry is established.
+    This configuration will apply the monthly entry repeatedly so that the total over the lease term equals the total incentive discount.
+    
+    For each recurring entry, your configuration should include a Debit and Credit line!
+    """)
+    
+    if monthly_adjustment is not None:
+        # Prepare a table for user configuration (for input only, not used for output).
+        lease_entry_df = pd.DataFrame({
+            "Category": ["", ""],
+            "Account": ["", ""],
+            "Entry Type": ["", ""],
+            "Amount ($)": [0, 0],
+            "Cadence": ["", ""],
+            "Duration": [0, 0]
+        }, index=["Line 1", "Line 2"])
+        # Dropdown options for configuration.
+        category_options = ["", "Asset", "Liability", "Equity", "Revenue", "Expense"]
+        lease_account_options = ["", "Concessions", "Rental Income"]
+        lease_entry_type_options = ["Debit", "Credit"]
+        cadence_options = ["", "Monthly", "Weekly", "Annually"]
+        
+        edited_lease_entry_df = st.data_editor(
+            lease_entry_df,
+            num_rows="fixed",
+            key="lease_entry_editor",
+            column_config={
+                "Category": st.column_config.SelectboxColumn("Category", options=category_options),
+                "Account": st.column_config.SelectboxColumn("Account", options=lease_account_options),
+                "Entry Type": st.column_config.SelectboxColumn("Entry Type", options=lease_entry_type_options),
+                "Cadence": st.column_config.SelectboxColumn("Cadence", options=cadence_options)
+            }
+        )
+        
+        st.markdown("When finished, click the button to submit your recurring journal entry configuration.")
+        if st.button("Submit Recurring Journal Entry", key="submit_lease_entry"):
+            # Instead of using the user's configuration, output the correct answer.
+            expected_config = pd.DataFrame({
+                "Category": ["Expense", "Revenue"],
+                "Account": ["Concessions", "Rental Income"],
+                "Entry Type": ["Debit", "Credit"],
+                "Amount ($)": [monthly_adjustment, monthly_adjustment],
+                "Cadence": ["Monthly", "Monthly"],
+                "Duration": [lease_term, lease_term]
+            }, index=["Line 1", "Line 2"])
+            st.markdown("### Correct Recurring Journal Entry Configuration")
+            st.table(expected_config)
+            
+            # Generate a schedule for the entire lease term.
+            months = list(range(1, int(lease_term) + 1))
+            schedule_rows = []
+            for m in months:
+                schedule_rows.append({
+                    "Month": m,
+                    "Category": "Expense",
+                    "Account": "Concessions",
+                    "Entry Type": "Debit",
+                    "Amount ($)": monthly_adjustment
+                })
+                schedule_rows.append({
+                    "Month": m,
+                    "Category": "Revenue",
+                    "Account": "Rental Income",
+                    "Entry Type": "Credit",
+                    "Amount ($)": monthly_adjustment
+                })
+            expected_schedule = pd.DataFrame(schedule_rows)
+            st.markdown("### Recurring Journal Entry Schedule")
+            st.table(expected_schedule)
+            st.markdown(f"Over {lease_term} months, the total lease incentive will be ${monthly_adjustment * lease_term:.2f}.")
+            st.success("Review the recurring schedule to understand how the entry is applied over the lease term.")
 
 def show_module6():
     st.header("Module 6: Review & Assessment")
-    st.markdown("### Course Recap")
-    with st.expander("Review Key Concepts", expanded=True):
-        st.markdown("""
-        **Recap:**
-        - **Module 1:** The five fundamental categories and balanced transactions.
-        - **Module 2:** Recording journal entries, accruals, and reversing entries.
-        - **Module 3:** Building and managing a Chart of Accounts.
-        - **Module 4:** Budgeting, forecasting, and consolidating financial data.
-        - **Module 5:** Real estate-specific accounting practices.
-        """)
+    st.markdown("### Final Multiple Choice Quiz")
     
-    st.markdown("### Final Quiz")
-    st.markdown("1. **Explain the double-entry system in your own words.**")
-    final_ans1 = st.text_area("Answer for Question 1:", key="final_q1")
-    st.markdown("2. **Describe how you would record an accrual and its reversing entry.**")
-    final_ans2 = st.text_area("Answer for Question 2:", key="final_q2")
-    st.markdown("3. **Outline the structure and importance of a Chart of Accounts.**")
-    final_ans3 = st.text_area("Answer for Question 3:", key="final_q3")
+    # Question 1
+    q1 = st.radio(
+        "1. What are the three primary financial statements?",
+        options=[
+            "Please select",
+            "Balance Sheet, Income Statement, Cash Flow Statement",
+            "Balance Sheet, Trial Balance, General Ledger",
+            "Income Statement, Statement of Retained Earnings, and Statement of Changes in Equity"
+        ],
+        key="q1"
+    )
     
-    st.markdown("4. **Multiple Choice: What is the correct journal entry for recording an accrual?**")
-    final_choice = st.radio("Select the correct entry", options=[
-        "Debit: Expense, Credit: Accrued Expenses",
-        "Debit: Accrued Expenses, Credit: Expense",
-        "Debit: Cash, Credit: Revenue"
-    ], key="final_mcq")
+    # Question 2
+    q2 = st.radio(
+        "2. Which account category does Cash belong to?",
+        options=[
+            "Please select",
+            "Assets",
+            "Liabilities",
+            "Equity",
+            "Revenue",
+            "Expenses"
+        ],
+        key="q2"
+    )
+    
+    # Question 3
+    q3 = st.radio(
+        "3. What is the fundamental equation of the Balance Sheet?",
+        options=[
+            "Please select",
+            "Assets = Liabilities + Equity",
+            "Assets = Liabilities - Equity",
+            "Assets + Liabilities = Equity"
+        ],
+        key="q3"
+    )
+    
+    # Question 4
+    q4 = st.radio(
+        "4. Which financial statement shows a company’s profitability over a period?",
+        options=[
+            "Please select",
+            "Income Statement",
+            "Balance Sheet",
+            "Cash Flow Statement"
+        ],
+        key="q4"
+    )
+    
+    # Question 5
+    q5 = st.radio(
+        "5. What does a journal entry do?",
+        options=[
+            "Please select",
+            "Records a transaction with debits and credits",
+            "Calculates net income",
+            "Provides an annual summary"
+        ],
+        key="q5"
+    )
+    
+    # Question 6
+    q6 = st.radio(
+        "6. In accrual accounting, when is revenue recognized?",
+        options=[
+            "Please select",
+            "When earned",
+            "When cash is received",
+            "When the invoice is issued",
+            "When the contract is signed"
+        ],
+        key="q6"
+    )
+    
+    # Question 7
+    q7 = st.radio(
+        "7. What is a reversing entry?",
+        options=[
+            "Please select",
+            "An entry that cancels a previous accrual",
+            "An entry that adjusts inventory",
+            "An entry that records depreciation"
+        ],
+        key="q7"
+    )
+    
+    # Question 8
+    q8 = st.radio(
+        "8. What effect does recording an accrual have on the financial statements?",
+        options=[
+            "Please select",
+            "Increases expenses and increases liabilities",
+            "Increases expenses and increases assets",
+            "Increases revenue and increases liabilities"
+        ],
+        key="q8"
+    )
+    
+    # Question 9
+    q9 = st.radio(
+        "9. What happens to net income when expenses exceed revenue?",
+        options=[
+            "Please select",
+            "Net loss",
+            "Net income is positive",
+            "No effect"
+        ],
+        key="q9"
+    )
+    
+    # Question 10
+    q10 = st.radio(
+        "10. What is the purpose of the Chart of Accounts?",
+        options=[
+            "Please select",
+            "To organize all accounts used by a company",
+            "To record individual transactions",
+            "To prepare bank reconciliations"
+        ],
+        key="q10"
+    )
     
     if st.button("Submit Final Quiz", key="submit_final_quiz"):
-        st.write("Your final quiz responses:")
-        st.write("Q1:", final_ans1)
-        st.write("Q2:", final_ans2)
-        st.write("Q3:", final_ans3)
-        if final_choice == "Debit: Expense, Credit: Accrued Expenses":
-            st.write("Q4: Correct!")
-        else:
-            st.write("Q4: Incorrect. The correct entry is: Debit: Expense, Credit: Accrued Expenses.")
-        st.info("Review your answers to ensure a solid understanding of the material.")
-    
-    st.markdown("### Next Steps")
-    st.markdown("""
-    - **Further Learning:** Consider additional resources (books, online courses) on accounting fundamentals.
-    - **Action Plan:** Identify one key process or concept from this course that you will apply to your work.
-    """)
-
-def show_appendix():
-    st.header("Appendix: Tools & Extra Resources")
-    st.markdown("""
-    **Interactive Tools Provided:**
-    - **Journal Entry Simulator:** Practice recording transactions and watch how the ledger updates.
-    - **Budget Builder:** Simulate how changes in revenue or expenses impact your forecast.
-    
-    **Additional Resources:**
-    - Online tutorials on accounting principles.
-    - Articles and books on real estate finance.
-    - Webinars and courses on integrating financial data with product management.
-    """)
-    st.info("Use these resources to further enhance your understanding and apply the concepts learned in this course.")
+        # Define correct answers
+        correct_answers = {
+            "q1": "Balance Sheet, Income Statement, Cash Flow Statement",
+            "q2": "Assets",
+            "q3": "Assets = Liabilities + Equity",
+            "q4": "Income Statement",
+            "q5": "Records a transaction with debits and credits",
+            "q6": "When earned",
+            "q7": "An entry that cancels a previous accrual",
+            "q8": "Increases expenses and increases liabilities",
+            "q9": "Net loss",
+            "q10": "To organize all accounts used by a company"
+        }
+        
+        user_answers = {
+            "q1": q1,
+            "q2": q2,
+            "q3": q3,
+            "q4": q4,
+            "q5": q5,
+            "q6": q6,
+            "q7": q7,
+            "q8": q8,
+            "q9": q9,
+            "q10": q10,
+        }
+        
+        results = []
+        score = 0
+        for q, correct in correct_answers.items():
+            user_ans = user_answers[q]
+            is_correct = (user_ans == correct)
+            if is_correct:
+                score += 1
+            results.append({
+                "Question": q,
+                "Your Answer": user_ans,
+                "Correct Answer": correct,
+                "Result": "Correct" if is_correct else "Incorrect"
+            })
+        
+        result_df = pd.DataFrame(results)
+        st.markdown("### Quiz Results")
+        st.table(result_df)
+        st.markdown(f"**Total Score: {score} out of 10**")
 
 if __name__ == '__main__':
     main()
