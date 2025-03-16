@@ -74,9 +74,12 @@ def show_module1():
         """)
         st.markdown("**Example Transaction: A company receives $2,000 in rental income.**")
         rental_data = {
-            "Account": ["Cash (Asset)", "Rental Income (Revenue)"],
-            "Debit": [2000, 0],
-            "Credit": [0, 2000]
+            "Category": ["Asset", "Revenue", "Asset", "Asset"],
+            "Account": ["Accounts Receivable", "Rental Income", "Cash", "Accounts Receivable"],
+            "Date": ["10/1", "10/1", "10/3", "10/3"],
+            "Debit": [2000, 0, 2000, 0],
+            "Credit": [0, 2000, 0, 2000]
+            
         }
         rental_df = pd.DataFrame(rental_data)
         st.table(rental_df)
